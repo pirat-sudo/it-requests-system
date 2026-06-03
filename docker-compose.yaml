@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  it-requests-app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - JWT_SECRET=your-super-secret-jwt-key-change-this
+    volumes:
+      - ./backend/database:/app/backend/database
+    restart: unless-stopped
