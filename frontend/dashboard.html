@@ -36,6 +36,16 @@
         </div>
 
         <div id="requestsTab" class="tab-content">
+            <div id="quickStats" class="quick-stats"></div>
+
+            <div class="quick-filters" id="quickFilters">
+                <button type="button" class="chip active" data-status="all">Все</button>
+                <button type="button" class="chip" data-status="new">Новые</button>
+                <button type="button" class="chip" data-status="in_progress">В работе</button>
+                <button type="button" class="chip" data-status="resolved">Решены</button>
+                <button type="button" class="chip" data-status="closed">Закрыты</button>
+            </div>
+
             <div class="filters-bar">
                 <div class="search-wrap">
                     <span class="search-icon" aria-hidden="true">⌕</span>
@@ -60,6 +70,7 @@
                 </select>
             </div>
 
+            <p class="results-info" id="resultsInfo"></p>
             <div id="requestsList" class="requests-list"></div>
         </div>
 

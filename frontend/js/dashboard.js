@@ -1,5 +1,6 @@
 let currentUser = null;
 let categories = [];
+let stopListPolling = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
     currentUser = App.requireAuth();
@@ -10,16 +11,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     const isIt = currentUser.role === 'it_specialist';
     document.getElementById('pageTitle').textContent = isIt ? 'Все заявки' : 'Мои заявки';
     document.getElementById('pageSubtitle').textContent = isIt
-        ? 'Обработка обращений сотрудников'
+        ? '18+ демо-заявок — все статусы, приоритеты и категории'
         : 'Создавайте обращения и отслеживайте их статус';
 
     initTabs();
     initModal();
     initFilters();
+    initQuickFilters();
 
     await loadCategories();
     await loadRequests();
     await loadStatistics();
+
+    stopListPolling = App.startPolling(() => {
+        const tabVisible = !document.getElementById('requestsTab').classList.contains('hidden');
+        if (tabVisible) return loadRequests(true);
+    }, 15000);
+});
+
+window.addEventListener('beforeunload', () => {
+    if (stopListPolling) stopListPolling();
 });
 
 function initTabs() {
@@ -40,6 +51,25 @@ function initTabs() {
                 statisticsTab.classList.remove('hidden');
                 loadStatistics();
             }
+        });
+    });
+}
+
+function initQuickFilters() {
+    document.querySelectorAll('#quickFilters .chip').forEach((chip) => {
+        chip.addEventListener('click', () => {
+            document.querySelectorAll('#quickFilters .chip').forEach((c) => c.classList.remove('active'));
+            chip.classList.add('active');
+            const status = chip.dataset.status;
+            document.getElementById('statusFilter').value = status;
+            loadRequests();
+        });
+    });
+
+    document.getElementById('statusFilter')?.addEventListener('change', () => {
+        const val = document.getElementById('statusFilter').value;
+        document.querySelectorAll('#quickFilters .chip').forEach((c) => {
+            c.classList.toggle('active', c.dataset.status === val);
         });
     });
 }
@@ -70,10 +100,10 @@ function initFilters() {
     let searchTimeout;
     document.getElementById('searchInput')?.addEventListener('input', () => {
         clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(loadRequests, 300);
+        searchTimeout = setTimeout(() => loadRequests(), 300);
     });
     ['categoryFilter', 'statusFilter', 'priorityFilter'].forEach((id) => {
-        document.getElementById(id)?.addEventListener('change', loadRequests);
+        document.getElementById(id)?.addEventListener('change', () => loadRequests());
     });
 }
 
@@ -92,7 +122,7 @@ async function loadCategories() {
         if (createSelect) {
             createSelect.innerHTML = '<option value="">Без категории</option>' + options;
         }
-    } catch (error) {
+    } catch {
         App.toast('Не удалось загрузить категории', 'error');
     }
 }
@@ -106,16 +136,48 @@ function getFilters() {
     };
 }
 
-async function loadRequests() {
+async function loadRequests(silent = false) {
     const container = document.getElementById('requestsList');
-    App.setLoading(container, true);
+    if (!silent) App.setLoading(container, true);
 
     try {
         const requests = await api.getRequests(getFilters());
         displayRequests(requests);
+        updateQuickStats(requests);
     } catch (error) {
-        container.innerHTML = `<div class="empty-state"><p>${App.escapeHtml(error.message)}</p></div>`;
-        App.toast(error.message, 'error');
+        if (!silent) {
+            container.innerHTML = `<div class="empty-state"><p>${App.escapeHtml(error.message)}</p></div>`;
+            App.toast(error.message, 'error');
+        }
+    }
+}
+
+function updateQuickStats(requests) {
+    const el = document.getElementById('quickStats');
+    if (!el) return;
+
+    const counts = { new: 0, in_progress: 0, resolved: 0, closed: 0 };
+    requests.forEach((r) => {
+        if (counts[r.status] !== undefined) counts[r.status]++;
+    });
+
+    el.innerHTML = `
+        <div class="quick-stat"><span class="quick-stat-value">${requests.length}</span><span class="quick-stat-label">в выборке</span></div>
+        <div class="quick-stat quick-stat--new"><span class="quick-stat-value">${counts.new}</span><span class="quick-stat-label">новых</span></div>
+        <div class="quick-stat quick-stat--progress"><span class="quick-stat-value">${counts.in_progress}</span><span class="quick-stat-label">в работе</span></div>
+        <div class="quick-stat quick-stat--done"><span class="quick-stat-value">${counts.resolved}</span><span class="quick-stat-label">решено</span></div>
+    `;
+
+    const info = document.getElementById('resultsInfo');
+    if (info) {
+        const filters = getFilters();
+        const parts = [];
+        if (filters.search) parts.push(`поиск: «${filters.search}»`);
+        if (filters.status && filters.status !== 'all') parts.push(App.getStatusText(filters.status));
+        if (filters.priority && filters.priority !== 'all') parts.push(App.getPriorityText(filters.priority));
+        info.textContent = parts.length
+            ? `Найдено ${requests.length} · ${parts.join(' · ')}`
+            : `Показано заявок: ${requests.length}`;
     }
 }
 
@@ -142,7 +204,7 @@ function displayRequests(requests) {
             return `
             <article class="request-card priority-${request.priority}" data-id="${request.id}" tabindex="0" role="button">
                 <div class="request-header">
-                    <h3 class="request-title">${App.escapeHtml(request.title)}</h3>
+                    <h3 class="request-title">#${request.id} · ${App.escapeHtml(request.title)}</h3>
                     <div class="card-badges">
                         ${App.statusBadge(request.status)}
                         ${App.priorityBadge(request.priority)}
@@ -150,9 +212,10 @@ function displayRequests(requests) {
                 </div>
                 <p class="request-description">${desc}</p>
                 <div class="request-meta">
-                    <span>${App.escapeHtml(request.category_name || 'Без категории')}</span>
-                    <span>${App.formatDate(request.created_at)}</span>
-                    <span>${App.escapeHtml(request.created_by_name || '')}</span>
+                    <span class="meta-tag">${App.escapeHtml(request.category_name || 'Без категории')}</span>
+                    <span class="meta-tag">${App.formatDate(request.created_at)}</span>
+                    <span class="meta-tag">${App.escapeHtml(request.created_by_name || '')}</span>
+                    ${request.assigned_to_name ? `<span class="meta-tag meta-tag--assignee">→ ${App.escapeHtml(request.assigned_to_name)}</span>` : ''}
                 </div>
             </article>`;
         })
@@ -226,7 +289,7 @@ async function loadStatistics() {
 
 function renderStatsRows(items, labelFn, valueFn) {
     if (!items?.length) {
-        return '<p class="no-data" style="padding:12px">Нет данных</p>';
+        return '<p class="panel-empty">Нет данных</p>';
     }
     return items
         .map(

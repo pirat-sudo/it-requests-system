@@ -60,6 +60,27 @@ const App = {
         });
     },
 
+    /**
+     * Автообновление данных (комментарии, список) без перезагрузки страницы.
+     */
+    startPolling(callback, intervalMs = 4000) {
+        const run = async () => {
+            if (document.hidden) return;
+            try {
+                await callback();
+            } catch {
+                /* тихий повтор при следующем интервале */
+            }
+        };
+
+        const timer = setInterval(run, intervalMs);
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) run();
+        });
+
+        return () => clearInterval(timer);
+    },
+
     toast(message, type = 'success') {
         let container = document.getElementById('toastContainer');
         if (!container) {

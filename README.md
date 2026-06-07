@@ -51,7 +51,7 @@ it-requests-system/
 ### Шаги
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/it-requests-system.git
+git clone https://github.com/pirat-sudo/it-requests-system.git
 cd it-requests-system/backend
 cp ../.env.example ../.env   # при необходимости отредактируйте JWT_SECRET
 npm install
@@ -67,6 +67,14 @@ npm start
 | ivanov | password123 | Сотрудник |
 | petrov | password123 | IT-специалист |
 | sidorova | password123 | Сотрудник |
+| kozlov, morozova, nikitina, orlov | password123 | Сотрудники |
+| vasiliev | password123 | IT-специалист |
+
+В системе **18 демо-заявок** (все статусы, приоритеты, категории). Для перезагрузки данных:
+
+```bash
+cd backend && npm run reseed && npm start
+```
 
 ## Запуск через Docker
 
@@ -119,13 +127,13 @@ npm test
 - [docs/TEST_CASES.md](docs/TEST_CASES.md) — тест-кейсы
 - [docs/REPORT.md](docs/REPORT.md) — шаблон отчёта по практике
 
-## Опубликованная версия
+## Репозиторий и публикация
 
-> После деплоя замените ссылку:
+**GitHub:** https://github.com/pirat-sudo/it-requests-system
 
-**Live:** https://your-app.onrender.com
+**Live (после деплоя на Render):** укажите URL сервиса здесь
 
-**Repository:** https://github.com/YOUR_USERNAME/it-requests-system
+Чеклист технологий для отчёта: [docs/TECH_CHECKLIST.md](docs/TECH_CHECKLIST.md)
 
 ## Лицензия
 

@@ -27,18 +27,29 @@
     <main class="page-content detail-grid">
         <div id="requestDetails" class="request-details"></div>
 
-        <section class="panel">
-            <h3>Комментарии</h3>
-            <div id="commentsList" class="comments-list"></div>
-            <div class="add-comment">
-                <textarea id="newComment" rows="3" placeholder="Напишите комментарий..."></textarea>
+        <section class="panel comments-panel">
+            <div class="panel-header">
+                <h3>Обсуждение <span class="count-badge" id="commentsCount">0</span></h3>
+                <span class="live-badge" title="Комментарии обновляются автоматически">
+                    <span class="live-dot"></span> Live
+                </span>
+            </div>
+
+            <div id="commentsListWrap" class="comments-list-wrap">
+                <div id="commentsList" class="comments-list"></div>
+            </div>
+
+            <div class="comment-compose">
+                <textarea id="newComment" rows="2" placeholder="Напишите сообщение… Enter — отправить"></textarea>
                 <button type="button" id="btnAddComment" class="btn btn-primary">Отправить</button>
             </div>
         </section>
 
         <section class="panel">
-            <h3>История статусов</h3>
-            <div id="statusHistory" class="history-list"></div>
+            <div class="panel-header">
+                <h3>История статусов</h3>
+            </div>
+            <div id="statusHistory" class="history-list history-timeline"></div>
         </section>
     </main>
 

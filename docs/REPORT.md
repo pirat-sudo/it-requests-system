@@ -71,8 +71,8 @@ Workflow: `.github/workflows/ci.yml` — установка зависимост
 | Параметр | Значение |
 |----------|----------|
 | Сервис | [Render.com](https://render.com) |
-| URL приложения | [ВСТАВЬТЕ_ССЫЛКУ] |
-| Репозиторий | [ВСТАВЬТЕ_ССЫЛКУ_GITHUB] |
+| URL приложения | [ВСТАВЬТЕ_ССЫЛКУ_RENDER] |
+| Репозиторий | https://github.com/pirat-sudo/it-requests-system |
 | Команда сборки | Docker (см. `render.yaml`) |
 | Deploy hook | GitHub Secret `RENDER_DEPLOY_HOOK` |
 
