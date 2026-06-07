@@ -131,7 +131,7 @@ npm test
 
 **GitHub:** https://github.com/pirat-sudo/it-requests-system
 
-**Live (после деплоя на Render):** укажите URL сервиса здесь
+**Live (после деплоя на Railway):** по ссылке https://it-requests-system-production.up.railway.app/login.html
 
 Чеклист технологий для отчёта: [docs/TECH_CHECKLIST.md](docs/TECH_CHECKLIST.md)
 
