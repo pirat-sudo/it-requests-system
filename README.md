@@ -22,7 +22,7 @@
 | БД | SQLite |
 | Контейнеры | Docker, Docker Compose |
 | CI/CD | GitHub Actions |
-| Деплой | Render.com (рекомендуется) |
+| Деплой | Render.com (рекомендуется), Railway |
 
 ## Структура проекта
 
