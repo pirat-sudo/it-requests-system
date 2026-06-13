@@ -110,7 +110,7 @@ npm test
 
 Опциональный деплой: [.github/workflows/deploy.yaml](.github/workflows/deploy.yaml) (нужен секрет `RENDER_DEPLOY_HOOK`).
 
-## Публикация на Render.com
+## Публикация на Render/Railway
 
 1. Создайте репозиторий на GitHub и загрузите проект.
 2. На [Render](https://dashboard.render.com) → **New** → **Blueprint** или **Web Service**.
