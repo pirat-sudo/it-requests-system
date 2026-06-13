@@ -1,17 +1,23 @@
-FROM node:18
+# 1. Используем современный образ Bookworm, где гарантированно есть свежий GLIBC
+FROM node:18-bookworm
 
 WORKDIR /app/backend
 
-# Копируем ТОЛЬКО package.json
+# 2. Копируем файлы зависимостей
 COPY backend/package*.json ./
 
-# Устанавливаем зависимости в контейнере
+# 3. Принудительно очищаем и устанавливаем зависимости внутри Linux
 RUN npm install --omit=dev
 
-# Копируем остальной код (node_modules будут пропущены через .dockerignore)
+# 4. Копируем остальной код бэкенда
 COPY backend/ ./
-COPY frontend/ ../frontend/
 
+# 5. Гарантируем, что локальный node_modules (если он просочился через COPY) удален,
+#    чтобы работали только что скомпилированные в контейнере пакеты
+RUN rm -rf node_modules && npm install --omit=dev
+
+# 6. Копируем фронтенд и настраиваем права
+COPY frontend/ ../frontend/
 RUN mkdir -p /app/backend/database && chmod 777 /app/backend/database
 
 EXPOSE 3000
