@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Заявки — IT Requests</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="app-shell">
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="dashboard.html" class="nav-brand">
+                <span class="brand-icon">IT</span>
+                <span>Requests</span>
+            </a>
+            <div class="nav-menu">
+                <div class="nav-user-block">
+                    <span id="userName" class="nav-user"></span>
+                    <span id="userRole" class="role-badge"></span>
+                </div>
+                <button type="button" id="btnCreateRequest" class="btn btn-primary">+ Заявка</button>
+                <button type="button" id="btnLogout" class="btn btn-ghost">Выйти</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="page-content">
+        <header class="page-header">
+            <h1 id="pageTitle">Мои заявки</h1>
+            <p id="pageSubtitle">Создавайте обращения и отслеживайте их статус</p>
+        </header>
+
+        <div class="dashboard-tabs">
+            <button type="button" class="tab-btn active" data-tab="requests">Заявки</button>
+            <button type="button" class="tab-btn" data-tab="statistics">Статистика</button>
+        </div>
+
+        <div id="requestsTab" class="tab-content">
+            <div id="quickStats" class="quick-stats"></div>
+
+            <div class="quick-filters" id="quickFilters">
+                <button type="button" class="chip active" data-status="all">Все</button>
+                <button type="button" class="chip" data-status="new">Новые</button>
+                <button type="button" class="chip" data-status="in_progress">В работе</button>
+                <button type="button" class="chip" data-status="resolved">Решены</button>
+                <button type="button" class="chip" data-status="closed">Закрыты</button>
+            </div>
+
+            <div class="filters-bar">
+                <div class="search-wrap">
+                    <span class="search-icon" aria-hidden="true">⌕</span>
+                    <input type="search" id="searchInput" placeholder="Поиск по заголовку или описанию..." autocomplete="off">
+                </div>
+                <select id="categoryFilter" aria-label="Категория">
+                    <option value="all">Все категории</option>
+                </select>
+                <select id="statusFilter" aria-label="Статус">
+                    <option value="all">Все статусы</option>
+                    <option value="new">Новые</option>
+                    <option value="in_progress">В работе</option>
+                    <option value="resolved">Решены</option>
+                    <option value="closed">Закрыты</option>
+                </select>
+                <select id="priorityFilter" aria-label="Приоритет">
+                    <option value="all">Все приоритеты</option>
+                    <option value="low">Низкий</option>
+                    <option value="medium">Средний</option>
+                    <option value="high">Высокий</option>
+                    <option value="critical">Критический</option>
+                </select>
+            </div>
+
+            <p class="results-info" id="resultsInfo"></p>
+            <div id="requestsList" class="requests-list"></div>
+        </div>
+
+        <div id="statisticsTab" class="tab-content hidden">
+            <div class="statistics-container">
+                <div class="stats-cards">
+                    <div class="stat-card">
+                        <h3>Всего</h3>
+                        <div class="stat-value" id="totalRequests">0</div>
+                    </div>
+                    <div class="stat-card accent-new">
+                        <h3>Новых</h3>
+                        <div class="stat-value" id="newRequests">0</div>
+                    </div>
+                    <div class="stat-card accent-progress">
+                        <h3>В работе</h3>
+                        <div class="stat-value" id="inProgressRequests">0</div>
+                    </div>
+                    <div class="stat-card accent-done">
+                        <h3>Решено</h3>
+                        <div class="stat-value" id="resolvedRequests">0</div>
+                    </div>
+                </div>
+
+                <div class="stats-section">
+                    <h3>По приоритетам</h3>
+                    <div id="priorityStats" class="stats-list"></div>
+                </div>
+
+                <div class="stats-section">
+                    <h3>Активность сотрудников</h3>
+                    <div id="userStats" class="stats-list"></div>
+                </div>
+
+                <div class="stats-section">
+                    <h3>По категориям</h3>
+                    <div id="categoryStats" class="stats-list"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="createRequestModal" class="modal" role="dialog" aria-labelledby="modalTitle" aria-modal="true">
+        <div class="modal-content">
+            <button type="button" class="modal-close" id="btnCloseModal" aria-label="Закрыть">×</button>
+            <h2 id="modalTitle">Новая заявка</h2>
+            <form id="createRequestForm">
+                <div class="form-group">
+                    <label for="requestTitle">Заголовок</label>
+                    <input type="text" id="requestTitle" required placeholder="Кратко опишите проблему">
+                </div>
+
+                <div class="form-group">
+                    <label for="requestDescription">Описание</label>
+                    <textarea id="requestDescription" rows="4" required placeholder="Подробности, место, оборудование..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="requestCategory">Категория</label>
+                    <select id="requestCategory"></select>
+                </div>
+
+                <div class="form-group">
+                    <label for="requestPriority">Приоритет</label>
+                    <select id="requestPriority">
+                        <option value="low">Низкий</option>
+                        <option value="medium" selected>Средний</option>
+                        <option value="high">Высокий</option>
+                        <option value="critical">Критический</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">Создать заявку</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>
