@@ -1,18 +1,26 @@
-# 1. Используем образ на базе Ubuntu 24.04 (Noble), где точно есть GLIBC 2.38+
-FROM node:18-noble
+# 1. Используем чистую Ubuntu 24.04, где системный GLIBC равен 2.39 (что выше требуемого 2.38)
+FROM ubuntu:24.04
+
+# 2. Устанавливаем Node.js 18 и базовые системные инструменты
+RUN apt-get update && apt-get install -y \
+    curl \
+    gnupg \
+    && curl -fsSL https://nodesource.com | bash - \
+    && apt-get install -y nodejs \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app/backend
 
-# 2. Копируем файлы зависимостей
+# 3. Копируем файлы зависимостей бэкенда
 COPY backend/package*.json ./
 
-# 3. Устанавливаем зависимости начисто
+# 4. Устанавливаем зависимости с нуля
 RUN npm install --omit=dev
 
-# 4. Копируем остальной код бэкенда
+# 5. Копируем остальной код бэкенда
 COPY backend/ ./
 
-# 5. Копируем фронтенд и настраиваем права
+# 6. Копируем фронтенд и выставляем права на директорию базы данных
 COPY frontend/ ../frontend/
 RUN mkdir -p /app/backend/database && chmod 777 /app/backend/database
 
