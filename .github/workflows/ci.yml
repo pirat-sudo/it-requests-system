@@ -35,6 +35,12 @@ jobs:
         run: |
           docker run -d --name it-requests-test -p 3001:3000 -e JWT_SECRET=ci-test-secret it-requests-system
           sleep 5
+          
+          echo "=== DOCKER CONTAINER STATUS ==="
+          docker ps -a
+          
+          echo "=== DOCKER CONTAINER LOGS ==="
+          docker logs it-requests-test
+          
+          echo "=== RUNNING CURL ==="
           curl -f http://localhost:3001/api/health
-          docker stop it-requests-test
-          docker rm it-requests-test
